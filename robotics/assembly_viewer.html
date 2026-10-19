@@ -1,0 +1,113 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;background:#f3f6f8;color:#21384b;font:14px 'Microsoft JhengHei',sans-serif}#view{height:540px;position:relative;border:1px solid #d9e3e8;border-radius:14px;overflow:hidden}canvas{display:block}#hud{position:absolute;left:18px;top:16px;background:#fffffff0;padding:12px 16px;border-radius:9px;max-width:65%;pointer-events:none}#hud strong{display:block;font-size:18px;margin-bottom:5px}#stage{color:#547381}#legend{position:absolute;right:12px;bottom:12px;background:#ffffffe8;padding:8px 12px;border-radius:7px;font-size:12px}.controls{padding:16px 4px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}button,select{border:1px solid #c9d8df;background:white;color:#254858;padding:9px 13px;border-radius:7px;cursor:pointer}button.main{background:#176f81;color:white;border-color:#176f81}button:hover{filter:brightness(.95)}input[type=range]{flex:1;min-width:180px;accent-color:#176f81}#progress{font-size:19px;min-width:66px;font-weight:bold}#details{background:white;border-radius:8px;padding:11px 15px;color:#59717b;line-height:1.8}label{white-space:nowrap;font-size:12px}.small{font-size:12px;color:#617987}
+@media(max-width:700px){#view{height:420px}#hud{left:10px;top:10px;max-width:95%;padding:8px 10px}#hud strong{font-size:15px}.controls{padding:9px 0;gap:6px}button,select{padding:7px 9px}#legend{font-size:10px;max-width:95%}#details{font-size:12px}}
+</style></head><body>
+<div id="view"><div id="hud"><strong id="title"></strong><div id="stage"></div><div id="viewState" class="small" style="margin-top:5px;color:#9a5b22"></div></div><div id="legend"></div></div>
+<div class="controls"><button id="play" class="main">▶ 播放全部</button><button id="reset">回到 0%</button><button id="prev">上一件</button><button id="next">下一件</button><input id="timeline" aria-label="完整裝配進度" type="range" min="0" max="100" value="0" step="0.05"><span id="progress">0%</span><button id="finish">完成 100%</button><select id="speed" aria-label="播放速度"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select><label><input id="ghost" type="checkbox">顯示待裝構件</label></div>
+<div class="controls" id="houseOptions"><button id="showWhole">完整外觀</button><button id="showInterior">室內完成／封牆前</button><label><input id="furniture" type="checkbox" checked>家具尺度</label><label><input id="cutaway" type="checkbox">剖視（隱藏屋頂與前側牆）</label><select id="floorFilter" aria-label="顯示樓層"><option value="0">全部樓層</option><option value="1">只看 1F</option><option value="2">只看 2F</option></select><span class="small">剖視只影響顯示；構件統計與裝配順序保留完整方案。</span></div>
+<div class="controls" id="robotOptions"><label><input id="trajectory" type="checkbox" checked>移動軌跡</label><label><input id="collisions" type="checkbox" checked>可能碰撞預檢</label><span class="small">藍線：夾具規劃軌跡 · 紅框：外框可能干涉</span></div><div id="details"></div><p class="small">滑鼠拖曳旋轉 · 滾輪縮放 · 右鍵平移。進度是裝配展示比例，不代表實際工時或施工驗證。</p>
+<script>__THREE__</script><script>__ORBIT__</script><script>
+const DATA=__DATA__,T=THREE,host=document.getElementById('view'),scene=new T.Scene();scene.background=new T.Color('#f3f6f8');
+const renderer=new T.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));host.appendChild(renderer.domElement);renderer.outputEncoding=T.sRGBEncoding;
+const camera=new T.PerspectiveCamera(42,1,.01,100);camera.up.set(0,0,1);const controls=new T.OrbitControls(camera,renderer.domElement);controls.enableDamping=false;
+scene.add(new T.HemisphereLight(0xffffff,0x7b8791,.6));const light=new T.DirectionalLight(0xfff3dc,.8);light.position.set(-3,-4,10);scene.add(light);const fill=new T.DirectionalLight(0xe4f1ff,.25);fill.position.set(6,3,5);scene.add(fill);
+const V=a=>new T.Vector3(...a),mm=a=>V(a).multiplyScalar(.001);let moving=[],installed=[],ghosts=[],progress=0,playing=false,last=0;const isHouse=DATA.mode==='house';let framePending=false,lastRoute=-1;const craneHeight=isHouse?Math.max(6.4,DATA.bounds_mm[1][2]/1000+1.8):0;
+function requestFrame(){if(!framePending){framePending=true;requestAnimationFrame(animate)}}
+controls.addEventListener('change',requestFrame);
+function material(c,alpha=1){return new T.MeshStandardMaterial({color:c,roughness:.75,metalness:.06,transparent:alpha<1,opacity:alpha,side:T.DoubleSide})}
+function meshData(v,f,color){const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(v.flat().map(x=>x/1000),3));g.setIndex(f.flat());g.computeVertexNormals();return new T.Mesh(g,material(color))}
+function box(x,y,z,dx,dy,dz,c){const m=new T.Mesh(new T.BoxGeometry(dx,dy,dz),material(c));m.position.set(x,y,z);scene.add(m);return m}
+function line(points,c){const g=new T.BufferGeometry().setFromPoints(points);const m=new T.Line(g,new T.LineBasicMaterial({color:c}));scene.add(m);return m}
+function segment(a,b,r,c){const g=new T.CylinderGeometry(r*.88,r,a.distanceTo(b),16);const m=new T.Mesh(g,material(c));m.position.copy(a).add(b).multiplyScalar(.5);m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),b.clone().sub(a).normalize());return m}
+function label(text,pos){const c=document.createElement('canvas');c.width=512;c.height=96;const ctx=c.getContext('2d');ctx.fillStyle='#ffffffdd';ctx.fillRect(0,0,512,96);ctx.fillStyle='#264c5b';ctx.font='bold 36px Microsoft JhengHei';ctx.textAlign='center';ctx.fillText(text,256,62);const sprite=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(c),depthTest:false}));sprite.position.copy(pos);sprite.scale.set(1.6,.3,1);scene.add(sprite);return sprite}
+function pathAt(points,t){let n=(points.length-1)*t,i=Math.min(points.length-2,Math.floor(n));return points[i].clone().lerp(points[i+1],n-i)}
+const grid=new T.GridHelper(isHouse?36:8,isHouse?60:16,0xb5c8cf,0xdfe7eb);grid.rotation.x=Math.PI/2;grid.position.z=isHouse?-.44:0;scene.add(grid);
+let count,routeLine,craneHook,robot,gripper,robotLinks=[],robotJoints=[],wristMeshes=[],robotBad=false,jointText='',jointBad=false;
+const catNames={partition:'室內隔間',floor:'樓板',corner:'角柱',wall:'牆體',door:'門框',window:'窗框',filler:'端部補板',closure:'斜屋頂封板',roof:'屋頂',stair:'樓梯踏步',trimmer:'洞口補強梁',guard:'臨時護欄'};
+let dimensionLabels=[],siteEquipment=[];
+__ABB__
+const colors={floor:'#abc5b5',corner:'#457787',wall:'#d2b184',door:'#89b0bf',window:'#89b0bf',filler:'#c9bab0',closure:'#c39ca4',roof:'#be955b'};
+if(isHouse){
+ count=DATA.items.length;camera.position.set(DATA.width/1000+12,-10,DATA.levels===2?15:11);camera.zoom=DATA.levels===2?1.1:1.3;camera.updateProjectionMatrix();controls.target.set(DATA.width/2000,DATA.length/2000,DATA.levels===2?3.2:1.7);
+ document.getElementById('cutaway').checked=false;document.getElementById('floorFilter').disabled=DATA.levels!==2;
+ document.getElementById('robotOptions').style.display='none';
+ const width=DATA.width/1000,length=DATA.length/1000,height=DATA.dimensions_m.height;
+ const dim=(a,b,text,pos)=>{const l=line([V(a),V(b)],'#2c5267'),tag=label(text,V(pos));tag.scale.set(3.2,.6,1);dimensionLabels.push(l,tag)};
+ dim([0,-1,-.4],[width,-1,-.4],`寬 ${DATA.dimensions_m.width.toFixed(3)} m`,[width/2,-1,-.2]);
+ dim([width+1,0,-.4],[width+1,length,-.4],`長 ${DATA.dimensions_m.length.toFixed(3)} m`,[width+1,length/2,-.1]);
+ dim([width+1,length,0],[width+1,length,height],`高 ${height.toFixed(3)} m`,[width+1,length,height/2]);
+
+ const cache={},edgeCache={};for(const [k,s] of Object.entries(DATA.meshes)){cache[k]=meshData(s.v,s.f,'#ccc').geometry;edgeCache[k]=new T.EdgesGeometry(cache[k],28)}
+ DATA.items.forEach((d,i)=>{const m=new T.Mesh(cache[d.key],material('#f7f4eb'));const edge=new T.LineSegments(edgeCache[d.key],new T.LineBasicMaterial({color:d.category==='partition'?'#765591':d.category==='roof'?'#355ab0':d.category==='floor'?'#2b828e':d.category==='corner'?'#b68e24':'#527d45',transparent:true,opacity:.9}));m.add(edge);m.rotation.z=d.rotation*Math.PI/180;m.position.copy(mm(d.translation));scene.add(m);m.userData.finalBounds=new T.Box3().setFromObject(m);installed.push(m);const g=new T.Mesh(cache[d.key],material('#a8b9c1',.09));g.rotation.copy(m.rotation);g.position.copy(m.position);scene.add(g);ghosts.push(g)});
+ const equipmentStart=scene.children.length;box(-2,2,-.3,2.7,3,.2,'#cbd5d9');label('構件暫存區',V([-2,2,.1]));
+ const base=V([-3.4,-1,0]),top=V([-3.4,-1,craneHeight]);scene.add(segment(base,top,.09,'#6c8190'));scene.add(segment(top,V([2,2,craneHeight]),.06,'#6c8190'));box(-3.4,-1,-.15,1.3,1.3,.3,'#556d7b');
+ craneHook=line([V([0,0,craneHeight]),V([0,0,0])],'#647988');siteEquipment=scene.children.slice(equipmentStart);
+ document.getElementById('legend').textContent='參考圖配色 · 青：樓板 · 綠：牆 · 黃：轉角 · 藍：雙坡屋頂';
+}else{
+ document.getElementById('houseOptions').style.display='none';
+ count=DATA.parts.length;camera.position.set(5.4,-7.5,4.6);controls.target.set(1,-.2,1.3);
+ const bw=DATA.bench_size_mm[0]/1000,bl=DATA.bench_size_mm[1]/1000;const bench=box(1.9,0,.68,bw,bl,.12,'#b9c7ce');obstacles.push({mesh:bench,name:'組裝治具台'});
+ for(const y of [-bl/2+.2,bl/2-.2])for(const x of [1.9-bw/2+.15,1.9+bw/2-.15]){const leg=box(x,y,.32,.09,.09,.64,'#7d919c');obstacles.push({mesh:leg,name:'治具台腳'})}
+ const stock=box(.6,-1.9,.5,.95,2.65,.1,'#bcc8cd');obstacles.push({mesh:stock,name:'料台'});
+ label('板件暫存台',V([.6,-3.1,.25]));label('單元組裝治具',V([1.9,bl/2+.25,.7]));
+ DATA.parts.forEach((p,i)=>{const m=meshData(p.v,p.f,'#bb4f4a');scene.add(m);installed.push(m);const a=p.frame;const matrix=new T.Matrix4().set(a[0][0],a[0][1],a[0][2],0,a[1][0],a[1][1],a[1][2],0,a[2][0],a[2][1],a[2][2],0,0,0,0,1);p.q=new T.Quaternion().setFromRotationMatrix(matrix);p.stack=V([.6,-1.9,.6+(count-1-i)*.032]);p.pickQ=new T.Quaternion().setFromAxisAngle(V([0,0,1]),Math.PI/2);const ghost=new T.Mesh(m.geometry,material('#68a6b1',.12));ghost.position.copy(mm(p.target));ghost.quaternion.copy(p.q);scene.add(ghost);ghosts.push(ghost)});
+ createABB();document.getElementById('ghost').checked=true;
+ document.getElementById('legend').textContent='青：六軸手臂　紅：板件　金：夾持中　淡青：目標位置';
+}
+function houseVisible(i){
+ const d=DATA.items[i],floor=Number(document.getElementById('floorFilter').value);
+ if(floor&&d.level!==floor)return false;
+ if(!document.getElementById('cutaway').checked)return true;
+ if(['roof','closure'].includes(d.category))return false;
+ const c=installed[i].userData.finalBounds.getCenter(new T.Vector3());
+ return !(['wall','door','window','corner'].includes(d.category)&&(c.y<.4||c.x>DATA.width/1000-.4));
+}
+const furnitureGroup=new T.Group();scene.add(furnitureGroup);
+if(isHouse){for(const f of DATA.interior?.furniture||[]){const [x,y,xx,yy]=f.box,z=(DATA.interior.config.floor-1)*DATA.storey_height_mm;
+const g=new T.BoxGeometry((xx-x)/1000,(yy-y)/1000,f.height_mm/1000),m=new T.Mesh(g,material(f.kind==='bed'?'#d8dfe4':f.kind==='wardrobe'?'#c4b79e':'#b5c9c3',.85));
+m.position.set((x+xx)/2000,(y+yy)/2000,(z+f.height_mm/2)/1000);m.add(new T.LineSegments(new T.EdgesGeometry(g),new T.LineBasicMaterial({color:'#6a7e82'})));furnitureGroup.add(m)}}
+document.getElementById('furniture').onchange=update;
+function update(){
+ requestFrame();
+ let value=progress*count/100,done=Math.min(count,Math.floor(value+1e-9)),frac=value-done;
+ const ghostOn=document.getElementById('ghost').checked;document.getElementById('timeline').value=progress;document.getElementById('progress').textContent=progress.toFixed(0)+'%';
+ if(isHouse){
+  const ff=DATA.interior?.config?.floor||1,filter=Number(document.getElementById('floorFilter').value);
+  furnitureGroup.visible=document.getElementById('furniture').checked&&(!filter||filter===ff)&&DATA.items.every((d,i)=>d.category!=='floor'||d.level!==ff||i<done);
+  dimensionLabels.forEach(m=>m.visible=done===count);
+  siteEquipment.forEach(m=>m.visible=done<count);
+  installed.forEach((m,i)=>{m.visible=i<=done&&done<count||i<done;m.position.copy(mm(DATA.items[i].translation));m.material.color.set(({partition:'#c4b1d6',stair:'#bd8c4e',guard:'#d7a336',trimmer:'#998364'})[DATA.items[i].category]||'#e9e2d1');ghosts[i].visible=ghostOn&&i>=done});
+  if(done<count){let d=DATA.items[done],m=installed[done],target=mm(d.translation),bounds=new T.Box3().setFromObject(m),centre=bounds.getCenter(new T.Vector3());const offset=centre.clone().sub(target);let start=V([-2,2,Math.max(.45,(bounds.max.z-bounds.min.z)/2+.2)]);const high=craneHeight-.3;const points=[start,V([start.x,start.y,high]),V([centre.x,centre.y,high]),centre];let pos=pathAt(points,frac);m.position.copy(pos).sub(offset);m.material.color.set('#e2a443');
+   const arr=craneHook.geometry.attributes.position;arr.setXYZ(0,pos.x,pos.y,craneHeight);arr.setXYZ(1,pos.x,pos.y,pos.z+.2);arr.needsUpdate=true;craneHook.visible=true;
+   document.getElementById('title').textContent=`${d.level||1}F ${catNames[d.category]}裝配 · ${done+1} / ${count}`;document.getElementById('stage').textContent=d.id+' · '+d.label;
+   document.getElementById('details').textContent=`已定位 ${done} / ${count} 件。${d.evidence==='source_mesh'?'來源 WikiHouse 構件，保留比例。':'參數化示意構件，接頭尚待深化。'} ${DATA.layout_name} · 雙斜屋頂 ${DATA.roof_pitch_deg}°。`;
+  }else{craneHook.visible=false;document.getElementById('title').textContent='100% · '+DATA.layout_name+' '+(DATA.levels||1)+' 層雙斜屋頂';document.getElementById('stage').textContent=`${count} 件構件展示完成`;
+   const d=DATA.dimensions_m,t=DATA.time_estimate;
+   document.getElementById('details').innerHTML=`<strong>模型外框：長 ${d.length.toFixed(3)} × 寬 ${d.width.toFixed(3)} × 高 ${d.height.toFixed(3)} m</strong><br>現場裝配情境估算：<strong>${t.hours.toFixed(1)} 小時 ≈ ${t.days.toFixed(1)} 個工作天</strong>（每日 ${t.hours_per_day} 小時）。<br>計算：準備 ${t.setup_hours} 小時 + ${count} 件 × ${t.minutes_per_item} 分鐘 ÷ 60 ÷ 作業效率 ${(t.efficiency*100).toFixed(0)}%。<br>${t.scope}。未以現場工時校準；100% 表示展示完成。`;
+  }
+  installed.forEach((m,i)=>{const show=houseVisible(i);m.visible=m.visible&&show;ghosts[i].visible=ghosts[i].visible&&show});
+  dimensionLabels.forEach(m=>m.visible=done===count&&!Number(document.getElementById('floorFilter').value));
+  const shown=installed.slice(0,done).filter(m=>m.visible).length,cut=document.getElementById('cutaway').checked,floor=Number(document.getElementById('floorFilter').value);
+  document.getElementById('viewState').textContent=(cut?'剖視模式':floor?'分層模式':'完整外觀')+(floor?' · 只看 '+floor+'F':'')+' · 已裝 '+done+' 件，顯示 '+shown+' 件'+(done>shown?'（'+(done-shown)+' 件依視圖設定隱藏）':'');
+ }else{
+  installed.forEach((m,i)=>{let p=DATA.parts[i];m.visible=true;m.material.color.set(i<done?'#b95149':'#c8726b');m.position.copy(i<done?mm(p.target):p.stack);m.quaternion.copy(i<done?p.q:p.pickQ);ghosts[i].visible=ghostOn&&i>=done});
+  const p=DATA.parts[Math.min(done,count-1)],pose=factoryPose(p,done<count?frac:1,Math.min(done,count-1));
+  const result=moveABB(pose.tcp,pose.toolQ);let m=installed[Math.min(done,count-1)];
+  if(done<count){m.position.copy(pose.pos);m.quaternion.copy(pose.q);if(pose.held){m.position.copy(result.actualTCP).addScaledVector(V([0,0,1]).applyQuaternion(result.actualQ),-.055);m.quaternion.copy(result.actualQ);m.material.color.set('#e9ac50')}}
+  const routeIndex=Math.min(done,count-1);if(lastRoute!==routeIndex){updateTrajectory(p,routeIndex);lastRoute=routeIndex}trajectory.visible=done<count&&document.getElementById('trajectory').checked;
+  const hits=collisionCheck(m,done,done<count&&pose.held,frac>.83);
+  document.getElementById('title').textContent=done<count?`單元組裝 · ${done+1} / ${count} · ${p.role_label}`:'100% · 單元組裝展示完成';
+  document.getElementById('stage').textContent=done<count?pose.stage+' · '+p.id.split(':').pop():'底板 → 遠側 → 內部肋板 → 近側 → 頂板';
+  const status=result.valid?'六軸解在設定角度範圍內':'目標無有效限位內解；手臂保持上一姿態，需重規劃';
+  const warn=hits.length?'<span style="color:#b13f39">可能干涉：'+hits.slice(0,6).join('、')+(hits.length>6?'…':'')+'</span>':'本幀未發現所檢查外框重疊';
+  document.getElementById('details').innerHTML=`<strong>${status}</strong> · TCP 誤差 ${result.error.toFixed(1)} mm<br>${abbAngles.map((v,i)=>'A'+(i+1)+' '+v.toFixed(1)+'°').join(' · ')}<br>${warn}<br>檢查手臂／夾具／搬運板件與已裝板、工作台的逐幀外框；接觸也會提示。未涵蓋自碰撞、未取料堆、連續掃掠及接頭可插入性。夾具為四吸盤示意。`;
+
+ }
+}
+document.getElementById('play').onclick=()=>{if(progress>=100)progress=0;playing=!playing;last=performance.now();document.getElementById('play').textContent=playing?'Ⅱ 暫停':'▶ 播放全部';update()};
+function seek(p){playing=false;progress=Math.max(0,Math.min(100,p));document.getElementById('play').textContent='▶ 播放全部';update()}
+document.getElementById('timeline').oninput=e=>seek(Number(e.target.value));document.getElementById('reset').onclick=()=>seek(0);document.getElementById('finish').onclick=()=>{if(isHouse){document.getElementById('cutaway').checked=false;document.getElementById('floorFilter').value='0'}seek(100)};document.getElementById('next').onclick=()=>seek((Math.floor(progress*count/100+1e-6)+1)/count*100);document.getElementById('prev').onclick=()=>seek((Math.ceil(progress*count/100-1e-6)-1)/count*100);document.getElementById('ghost').onchange=update;document.getElementById('trajectory').onchange=update;document.getElementById('collisions').onchange=update;document.getElementById('cutaway').onchange=update;document.getElementById('floorFilter').onchange=update;document.getElementById('showWhole').onclick=()=>{document.getElementById('cutaway').checked=false;document.getElementById('floorFilter').value='0';update()};
+document.getElementById('showInterior').onclick=()=>{const floor=Number(document.getElementById('floorFilter').value)||DATA.interior?.config?.floor||1;const end=DATA.items.findIndex(d=>d.level===floor&&['corner','wall','door','window'].includes(d.category));if(end>=0)seek(end/count*100)};
+new ResizeObserver(()=>{renderer.setSize(host.clientWidth,host.clientHeight);camera.aspect=host.clientWidth/host.clientHeight;if(isHouse)camera.zoom=(DATA.levels===2?1.1:1.3)*Math.min(1,camera.aspect/1.3);camera.updateProjectionMatrix();requestFrame()}).observe(host);
+function animate(now){framePending=false;if(playing&&now-last<1000/30){requestFrame();return}const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){progress=Math.min(100,progress+dt*Number(document.getElementById('speed').value)*(isHouse?2:1.5));update();if(progress>=100){playing=false;document.getElementById('play').textContent='▶ 播放全部'}}controls.update();renderer.render(scene,camera);if(playing)requestFrame()}update();
+</script></body></html>

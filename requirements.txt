@@ -1,0 +1,7 @@
+streamlit==1.65.0
+plotly==7.1.0
+rhino3dm==8.35.0
+numpy==2.5.4
+pandas==3.0.6
+python-dotenv
+reportlab>=4.0,<5

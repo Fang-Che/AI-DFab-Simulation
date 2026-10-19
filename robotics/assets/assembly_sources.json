@@ -1,0 +1,15 @@
+{
+  "robot": {
+    "model": "KUKA KR 360 R2830",
+    "url": "https://cdn.robodk.com/downloads-library/library-robots/KUKA-KR-360-R2830.robot",
+    "sha256": "0d64b13add6bffa7a90c753ee87f8d83c6f5dc480363bad0bebf73114b019a50",
+    "format": "RoboDK native model",
+    "loaded_in_web_renderer": false
+  },
+  "viewer": {
+    "library": "three.js r128",
+    "license": "MIT"
+  },
+  "manis_reference": "https://github.com/ibois-epfl/Manis-timber-plate-joinery-solver",
+  "manis_executed": false
+}

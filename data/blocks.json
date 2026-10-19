@@ -1,0 +1,773 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "source": "WikiHouse Skylark official design guide & block library",
+    "source_url": "https://www.wikihouse.cc/design/wikihouse-blocks",
+    "last_updated": "2026-05-07",
+    "grid_unit_mm": 600,
+    "notes": "All dimensions in mm. Width = along wall, Depth = wall thickness, Height = floor to top of block."
+  },
+
+  "system_rules": {
+    "grid_mm": 600,
+    "max_stories": 3,
+    "plan_form": "orthogonal_only",
+    "sk200": {
+      "wall_depth_mm": 268,
+      "max_span_m": 4.5,
+      "suitable_stories": [1],
+      "u_value_wm2k": 0.17
+    },
+    "sk250": {
+      "wall_depth_mm": 318,
+      "max_span_m": 5.7,
+      "suitable_stories": [1, 2, 3],
+      "u_value_wm2k": 0.14
+    },
+    "opening_sizes_mm": [600, 1200, 1800, 2400],
+    "wall_height_increments_mm": 300
+  },
+
+  "blocks": [
+
+    {
+      "id": "SK250-WALL-XS",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall XS",
+      "description": "Standard wall block, extra small height. Used for low-height walls or below window sills.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 1200
+      },
+      "weight_kg": 20,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "interior_wall", "low_wall", "below_window"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": [],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "250series"],
+      "download": {
+        "skp": "SKYLARK250_WALL-XS_simple.skp",
+        "dxf": "SKYLARK250_WALL-XS.dxf",
+        "ifc": "SKYLARK250_WALL-XS.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-S",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall S",
+      "description": "Standard wall block, small height (2.1m ceiling). Suitable for single storey buildings.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 2100
+      },
+      "weight_kg": 33,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "interior_wall", "single_storey"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg"],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "250series", "single-storey"],
+      "download": {
+        "skp": "SKYLARK250_WALL-S_simple.skp",
+        "dxf": "SKYLARK250_WALL-S.dxf",
+        "ifc": "SKYLARK250_WALL-S.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-M",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall M",
+      "description": "Standard wall block, medium height (2.4m ceiling). Most common block for single and double storey builds.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 2400
+      },
+      "weight_kg": 39,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "interior_wall", "single_storey", "two_storey", "most_common"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg", "gable"],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "250series", "most-common", "2400"],
+      "download": {
+        "skp": "SKYLARK250_WALL-M_simple.skp",
+        "dxf": "SKYLARK250_WALL-M.dxf",
+        "ifc": "SKYLARK250_WALL-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-L",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall L",
+      "description": "Standard wall block, large height (2.7m ceiling). Used for taller single storey or ground floor of two storey.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 2700
+      },
+      "weight_kg": 44,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "interior_wall", "tall_ceiling", "two_storey"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg"],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "250series", "tall", "2700"],
+      "download": {
+        "skp": "SKYLARK250_WALL-L_simple.skp",
+        "dxf": "SKYLARK250_WALL-L.dxf",
+        "ifc": "SKYLARK250_WALL-L.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-XL",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall XL",
+      "description": "Standard wall block, extra large height (3.0m ceiling). Used when pairing with sloping 10 degree roof for gable end.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 3000
+      },
+      "weight_kg": 49,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "gable_end", "sloping_roof_high_side"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["sloping_10deg"],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "250series", "xl", "3000", "gable"],
+      "download": {
+        "skp": "SKYLARK250_WALL-XL_simple.skp",
+        "dxf": "SKYLARK250_WALL-XL.dxf",
+        "ifc": "SKYLARK250_WALL-XL.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-WIN-XS",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "window_opening",
+      "label": "Wall with window opening XS (600mm)",
+      "description": "Wall block with a 600mm wide window or door opening. Requires lintel above.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 318,
+        "height_mm": 2400,
+        "opening_width_mm": 600
+      },
+      "weight_kg": 30,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 10
+      },
+      "use_context": ["exterior_wall", "window", "door", "small_opening"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg", "gable"],
+      "requires_lintel": true,
+      "lintel_note": "Lintel required above opening. Size specified by Structural Engineer.",
+      "tags": ["window", "opening", "600mm", "250series"],
+      "download": {
+        "skp": "SKYLARK250_WALL-WIN-XS_simple.skp",
+        "dxf": "SKYLARK250_WALL-WIN-XS.dxf",
+        "ifc": "SKYLARK250_WALL-WIN-XS.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-WIN-S",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "window_opening",
+      "label": "Wall with window opening S (1200mm)",
+      "description": "Wall block with a 1200mm wide window or door opening. Standard door width. Requires lintel.",
+      "dimensions": {
+        "width_mm": 1200,
+        "depth_mm": 318,
+        "height_mm": 2400,
+        "opening_width_mm": 1200
+      },
+      "weight_kg": 52,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 10
+      },
+      "use_context": ["exterior_wall", "standard_door", "window", "entrance"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg", "gable"],
+      "requires_lintel": true,
+      "lintel_note": "Lintel required. Half-tie bowtie connectors used around opening.",
+      "tags": ["window", "door", "opening", "1200mm", "standard-door", "250series"],
+      "download": {
+        "skp": "SKYLARK250_WALL-WIN-S_simple.skp",
+        "dxf": "SKYLARK250_WALL-WIN-S.dxf",
+        "ifc": "SKYLARK250_WALL-WIN-S.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-WIN-M",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "window_opening",
+      "label": "Wall with window opening M (1800mm)",
+      "description": "Wall block with a 1800mm wide opening. Suitable for large windows or wide doors.",
+      "dimensions": {
+        "width_mm": 1800,
+        "depth_mm": 318,
+        "height_mm": 2400,
+        "opening_width_mm": 1800
+      },
+      "weight_kg": 72,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 9
+      },
+      "use_context": ["exterior_wall", "large_window", "wide_door", "sliding_door"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg", "gable"],
+      "requires_lintel": true,
+      "lintel_note": "Lintel required. Engineer to confirm size for this span.",
+      "tags": ["window", "door", "opening", "1800mm", "large", "250series"],
+      "download": {
+        "skp": "SKYLARK250_WALL-WIN-M_simple.skp",
+        "dxf": "SKYLARK250_WALL-WIN-M.dxf",
+        "ifc": "SKYLARK250_WALL-WIN-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-WALL-WIN-L",
+      "series": "skylark250",
+      "category": "wall",
+      "subtype": "window_opening",
+      "label": "Wall with window opening L (2400mm)",
+      "description": "Wall block with a 2400mm wide opening. Maximum standard opening width. For large glazing or bifold doors.",
+      "dimensions": {
+        "width_mm": 2400,
+        "depth_mm": 318,
+        "height_mm": 2400,
+        "opening_width_mm": 2400
+      },
+      "weight_kg": 90,
+      "performance": {
+        "u_value_wm2k": 0.14,
+        "insulation_depth_mm": 250,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 8
+      },
+      "use_context": ["exterior_wall", "bifold_door", "large_glazing", "panoramic_window"],
+      "compatible_series": ["skylark250"],
+      "roof_compatibility": ["flat", "sloping_10deg", "gable"],
+      "requires_lintel": true,
+      "lintel_note": "Lintel required. Structural engineer must specify size. Bracing wall nearby recommended.",
+      "tags": ["window", "door", "opening", "2400mm", "bifold", "maximum", "250series"],
+      "download": {
+        "skp": "SKYLARK250_WALL-WIN-L_simple.skp",
+        "dxf": "SKYLARK250_WALL-WIN-L.dxf",
+        "ifc": "SKYLARK250_WALL-WIN-L.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-FLOOR-S",
+      "series": "skylark250",
+      "category": "floor",
+      "subtype": "standard",
+      "label": "Floor beam S (3.6m span)",
+      "description": "Floor cassette block for 3.6m internal span. Suitable for smaller rooms. Includes ventilation duct holes.",
+      "dimensions": {
+        "span_mm": 3600,
+        "width_mm": 600,
+        "depth_mm": 250
+      },
+      "weight_kg": 45,
+      "performance": {
+        "imposed_load_kn_m2": 1.5,
+        "dead_load_kn_m2": 0.5,
+        "ventilation_duct_diameter_mm": 130,
+        "service_zone": true
+      },
+      "use_context": ["ground_floor", "upper_floor", "small_room", "bathroom", "hallway"],
+      "compatible_series": ["skylark250"],
+      "compatible_roof_blocks": ["SK250-ROOF-S"],
+      "requires_wall_support": true,
+      "wall_support_note": "Must rest on wall blocks at each end. Internal span 3.6m.",
+      "tags": ["floor", "3600mm", "S-span", "250series"],
+      "download": {
+        "skp": "SKYLARK250_FLOOR-S_simple.skp",
+        "dxf": "SKYLARK250_FLOOR-S.dxf",
+        "ifc": "SKYLARK250_FLOOR-S.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-FLOOR-M",
+      "series": "skylark250",
+      "category": "floor",
+      "subtype": "standard",
+      "label": "Floor beam M (4.8m span)",
+      "description": "Floor cassette block for 4.8m internal span. Most common floor block. Includes ventilation duct holes.",
+      "dimensions": {
+        "span_mm": 4800,
+        "width_mm": 600,
+        "depth_mm": 250
+      },
+      "weight_kg": 58,
+      "performance": {
+        "imposed_load_kn_m2": 1.5,
+        "dead_load_kn_m2": 0.5,
+        "ventilation_duct_diameter_mm": 130,
+        "service_zone": true
+      },
+      "use_context": ["ground_floor", "upper_floor", "living_room", "bedroom", "most_common"],
+      "compatible_series": ["skylark250"],
+      "compatible_roof_blocks": ["SK250-ROOF-M"],
+      "requires_wall_support": true,
+      "wall_support_note": "Must rest on wall blocks at each end. Internal span 4.8m.",
+      "tags": ["floor", "4800mm", "M-span", "250series", "most-common"],
+      "download": {
+        "skp": "SKYLARK250_FLOOR-M_simple.skp",
+        "dxf": "SKYLARK250_FLOOR-M.dxf",
+        "ifc": "SKYLARK250_FLOOR-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-FLOOR-L",
+      "series": "skylark250",
+      "category": "floor",
+      "subtype": "standard",
+      "label": "Floor beam L (5.4m span)",
+      "description": "Floor cassette block for 5.4m internal span. Maximum standard span for Skylark 250. Includes ventilation duct holes.",
+      "dimensions": {
+        "span_mm": 5400,
+        "width_mm": 600,
+        "depth_mm": 250
+      },
+      "weight_kg": 68,
+      "performance": {
+        "imposed_load_kn_m2": 1.5,
+        "dead_load_kn_m2": 0.5,
+        "ventilation_duct_diameter_mm": 130,
+        "service_zone": true
+      },
+      "use_context": ["ground_floor", "upper_floor", "open_plan", "large_room"],
+      "compatible_series": ["skylark250"],
+      "compatible_roof_blocks": ["SK250-ROOF-L"],
+      "requires_wall_support": true,
+      "wall_support_note": "Must rest on wall blocks at each end. Internal span 5.4m. Maximum standard span.",
+      "tags": ["floor", "5400mm", "L-span", "250series", "maximum-span"],
+      "download": {
+        "skp": "SKYLARK250_FLOOR-L_simple.skp",
+        "dxf": "SKYLARK250_FLOOR-L.dxf",
+        "ifc": "SKYLARK250_FLOOR-L.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-ROOF-FLAT-1DEG",
+      "series": "skylark250",
+      "category": "roof",
+      "subtype": "flat",
+      "label": "Flat roof block (1 degree fall)",
+      "description": "Flat roof block with 1 degree drainage fall. Minimum fall for water run-off. Easy access during assembly.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 250
+      },
+      "performance": {
+        "pitch_degrees": 1,
+        "drainage": "single_side",
+        "service_zone_mm": 70
+      },
+      "use_context": ["flat_roof", "minimal_pitch", "roof_terrace_possible"],
+      "compatible_series": ["skylark250"],
+      "compatible_wall_blocks": ["SK250-WALL-M", "SK250-WALL-L"],
+      "tags": ["roof", "flat", "1degree", "250series"],
+      "download": {
+        "skp": "SKYLARK250_ROOF-FLAT-1DEG_simple.skp",
+        "dxf": "SKYLARK250_ROOF-FLAT-1DEG.dxf",
+        "ifc": "SKYLARK250_ROOF-FLAT-1DEG.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-ROOF-FLAT-10DEG",
+      "series": "skylark250",
+      "category": "roof",
+      "subtype": "flat",
+      "label": "Sloping roof block (10 degree pitch)",
+      "description": "Mono-pitch sloping roof block at 10 degrees. Works with M wall on low side and XL wall on high side.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 250
+      },
+      "performance": {
+        "pitch_degrees": 10,
+        "drainage": "low_side",
+        "service_zone_mm": 70
+      },
+      "use_context": ["mono_pitched_roof", "sloping_roof", "single_storey"],
+      "compatible_series": ["skylark250"],
+      "compatible_wall_blocks": {
+        "low_side": "SK250-WALL-M",
+        "high_side": "SK250-WALL-XL"
+      },
+      "tags": ["roof", "sloping", "10degree", "mono-pitch", "250series"],
+      "download": {
+        "skp": "SKYLARK250_ROOF-10DEG_simple.skp",
+        "dxf": "SKYLARK250_ROOF-10DEG.dxf",
+        "ifc": "SKYLARK250_ROOF-10DEG.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-ROOF-GABLE-M",
+      "series": "skylark250",
+      "category": "roof",
+      "subtype": "gable",
+      "label": "Gable roof block M (4.8m span, 42 degrees)",
+      "description": "Gable (apex) roof block for 4.8m internal span at 42 degrees pitch. Requires ridge beam. Two identical halves lift from inside.",
+      "dimensions": {
+        "span_mm": 4800,
+        "width_mm": 600,
+        "pitch_degrees": 42
+      },
+      "performance": {
+        "pitch_degrees": 42,
+        "ridge_beam_width_mm": 90,
+        "ridge_beam_type": "glulam_or_LVL",
+        "service_zone_mm": 70
+      },
+      "use_context": ["gable_roof", "traditional_roof", "apex_roof", "4800_span"],
+      "compatible_series": ["skylark250"],
+      "compatible_floor_blocks": ["SK250-FLOOR-M"],
+      "compatible_wall_blocks": ["SK250-WALL-M"],
+      "requires_ridge_beam": true,
+      "ridge_beam_note": "90mm wide glulam or LVL ridge beam required. Engineer specifies depth.",
+      "tags": ["roof", "gable", "apex", "42degree", "4800mm", "M-span", "250series"],
+      "download": {
+        "skp": "SKYLARK250_ROOF-GABLE-M_simple.skp",
+        "dxf": "SKYLARK250_ROOF-GABLE-M.dxf",
+        "ifc": "SKYLARK250_ROOF-GABLE-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK250-BOWTIE-1",
+      "series": "skylark250",
+      "category": "connector",
+      "subtype": "bowtie_main",
+      "label": "Bowtie 1 (main connector)",
+      "description": "Primary connector joining block parts together. Used throughout the chassis.",
+      "dimensions": {
+        "length_mm": 300,
+        "width_mm": 80
+      },
+      "weight_kg": 0.5,
+      "performance": {},
+      "use_context": ["block_connection", "chassis_assembly", "all_blocks"],
+      "compatible_series": ["skylark250"],
+      "tags": ["connector", "bowtie", "assembly", "250series"],
+      "download": {
+        "skp": "SKYLARK250_BOWTIE-1.skp",
+        "dxf": "SKYLARK250_BOWTIE-1.dxf"
+      }
+    },
+
+    {
+      "id": "SK250-BOWTIE-HALF",
+      "series": "skylark250",
+      "category": "connector",
+      "subtype": "bowtie_half",
+      "label": "Half-tie (opening connector)",
+      "description": "Half bowtie connector used around window and door openings.",
+      "dimensions": {
+        "length_mm": 150,
+        "width_mm": 80
+      },
+      "weight_kg": 0.25,
+      "performance": {},
+      "use_context": ["window_opening", "door_opening", "opening_perimeter"],
+      "compatible_series": ["skylark250"],
+      "tags": ["connector", "half-tie", "opening", "window", "door", "250series"],
+      "download": {
+        "skp": "SKYLARK250_BOWTIE-HALF.skp",
+        "dxf": "SKYLARK250_BOWTIE-HALF.dxf"
+      }
+    },
+
+    {
+      "id": "SK250-BOWTIE-2",
+      "series": "skylark250",
+      "category": "connector",
+      "subtype": "bowtie_floor",
+      "label": "Bowtie 2 (floor-to-end connector)",
+      "description": "Connects floor blocks to end wall blocks.",
+      "dimensions": {
+        "length_mm": 300,
+        "width_mm": 80
+      },
+      "weight_kg": 0.5,
+      "performance": {},
+      "use_context": ["floor_to_wall", "floor_end_connection"],
+      "compatible_series": ["skylark250"],
+      "tags": ["connector", "bowtie2", "floor", "250series"],
+      "download": {
+        "skp": "SKYLARK250_BOWTIE-2.skp",
+        "dxf": "SKYLARK250_BOWTIE-2.dxf"
+      }
+    },
+
+    {
+      "id": "SK250-BOWTIE-CORNER",
+      "series": "skylark250",
+      "category": "connector",
+      "subtype": "bowtie_corner",
+      "label": "Bowtie corner (internal corner connector)",
+      "description": "Corner connector piece for internal corners of the chassis.",
+      "dimensions": {
+        "size_mm": 150
+      },
+      "weight_kg": 0.3,
+      "performance": {},
+      "use_context": ["internal_corner", "corner_junction"],
+      "compatible_series": ["skylark250"],
+      "tags": ["connector", "corner", "internal-corner", "250series"],
+      "download": {
+        "skp": "SKYLARK250_BOWTIE-CORNER.skp",
+        "dxf": "SKYLARK250_BOWTIE-CORNER.dxf"
+      }
+    },
+
+    {
+      "id": "SK200-WALL-M",
+      "series": "skylark200",
+      "category": "wall",
+      "subtype": "standard",
+      "label": "Wall M (Skylark 200)",
+      "description": "Standard wall block for Skylark 200 series. Thinner and lighter than 250 series. Best for single storey or mild climates.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 268,
+        "height_mm": 2400
+      },
+      "weight_kg": 32,
+      "performance": {
+        "u_value_wm2k": 0.17,
+        "insulation_depth_mm": 200,
+        "service_zone_mm": 32,
+        "load_capacity_kn": 13
+      },
+      "use_context": ["exterior_wall", "interior_wall", "single_storey", "lightweight"],
+      "compatible_series": ["skylark200"],
+      "roof_compatibility": ["flat", "sloping_10deg"],
+      "requires_lintel": false,
+      "tags": ["standard", "wall", "200series", "lightweight", "2400"],
+      "download": {
+        "skp": "SKYLARK200_WALL-M_simple.skp",
+        "dxf": "SKYLARK200_WALL-M.dxf",
+        "ifc": "SKYLARK200_WALL-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK200-FLOOR-S",
+      "series": "skylark200",
+      "category": "floor",
+      "subtype": "standard",
+      "label": "Floor beam S (Skylark 200, 3.6m span)",
+      "description": "Floor cassette for Skylark 200 series, 3.6m internal span.",
+      "dimensions": {
+        "span_mm": 3600,
+        "width_mm": 600,
+        "depth_mm": 200
+      },
+      "weight_kg": 36,
+      "performance": {
+        "imposed_load_kn_m2": 1.5,
+        "dead_load_kn_m2": 0.5
+      },
+      "use_context": ["ground_floor", "small_room", "single_storey"],
+      "compatible_series": ["skylark200"],
+      "compatible_roof_blocks": ["SK200-ROOF-FLAT"],
+      "requires_wall_support": true,
+      "tags": ["floor", "3600mm", "200series"],
+      "download": {
+        "skp": "SKYLARK200_FLOOR-S_simple.skp",
+        "dxf": "SKYLARK200_FLOOR-S.dxf",
+        "ifc": "SKYLARK200_FLOOR-S.ifc"
+      }
+    },
+
+    {
+      "id": "SK200-FLOOR-M",
+      "series": "skylark200",
+      "category": "floor",
+      "subtype": "standard",
+      "label": "Floor beam M (Skylark 200, 4.2m span)",
+      "description": "Floor cassette for Skylark 200 series, 4.2m internal span. Maximum standard span for Skylark 200.",
+      "dimensions": {
+        "span_mm": 4200,
+        "width_mm": 600,
+        "depth_mm": 200
+      },
+      "weight_kg": 44,
+      "performance": {
+        "imposed_load_kn_m2": 1.5,
+        "dead_load_kn_m2": 0.5
+      },
+      "use_context": ["ground_floor", "bedroom", "single_storey", "maximum_200_span"],
+      "compatible_series": ["skylark200"],
+      "compatible_roof_blocks": ["SK200-ROOF-FLAT"],
+      "requires_wall_support": true,
+      "wall_support_note": "Maximum standard span for Skylark 200 series.",
+      "tags": ["floor", "4200mm", "200series", "maximum-span"],
+      "download": {
+        "skp": "SKYLARK200_FLOOR-M_simple.skp",
+        "dxf": "SKYLARK200_FLOOR-M.dxf",
+        "ifc": "SKYLARK200_FLOOR-M.ifc"
+      }
+    },
+
+    {
+      "id": "SK200-ROOF-FLAT",
+      "series": "skylark200",
+      "category": "roof",
+      "subtype": "flat",
+      "label": "Flat roof block (Skylark 200)",
+      "description": "Flat roof block for Skylark 200 series with pre-engineered drainage fall.",
+      "dimensions": {
+        "width_mm": 600,
+        "depth_mm": 200
+      },
+      "performance": {
+        "pitch_degrees": 1,
+        "drainage": "single_side",
+        "service_zone_mm": 70
+      },
+      "use_context": ["flat_roof", "single_storey", "200series"],
+      "compatible_series": ["skylark200"],
+      "compatible_wall_blocks": ["SK200-WALL-M"],
+      "tags": ["roof", "flat", "200series"],
+      "download": {
+        "skp": "SKYLARK200_ROOF-FLAT_simple.skp",
+        "dxf": "SKYLARK200_ROOF-FLAT.dxf",
+        "ifc": "SKYLARK200_ROOF-FLAT.ifc"
+      }
+    }
+
+  ],
+
+  "design_guidance": {
+    "series_selection": {
+      "sk200_suitable_when": [
+        "single storey building only",
+        "mild climate with lower thermal requirements",
+        "smaller spans under 4.5m",
+        "budget is a priority (lighter = less material)",
+        "additional external insulation will be added"
+      ],
+      "sk250_suitable_when": [
+        "two or three storey building",
+        "high thermal performance required (U=0.14)",
+        "spans up to 5.7m needed",
+        "standard UK or northern European climate",
+        "most common choice for residential builds"
+      ]
+    },
+    "span_to_floor_block_mapping": {
+      "up_to_3600mm": "SK250-FLOOR-S",
+      "up_to_4800mm": "SK250-FLOOR-M",
+      "up_to_5400mm": "SK250-FLOOR-L",
+      "note": "Floor block span = internal width of building in one direction"
+    },
+    "roof_to_wall_pairing": {
+      "flat_roof": ["SK250-WALL-M", "SK250-WALL-L"],
+      "sloping_10deg": {
+        "low_side_wall": "SK250-WALL-M",
+        "high_side_wall": "SK250-WALL-XL"
+      },
+      "gable_42deg": {
+        "wall": "SK250-WALL-M",
+        "requires_ridge_beam": true
+      }
+    },
+    "common_configurations": {
+      "small_studio_20sqm": {
+        "series": "SK200",
+        "floor_block": "SK200-FLOOR-M",
+        "wall_block": "SK200-WALL-M",
+        "roof": "SK200-ROOF-FLAT",
+        "approx_blocks": 24
+      },
+      "one_bed_house_40sqm": {
+        "series": "SK250",
+        "floor_block": "SK250-FLOOR-M",
+        "wall_block": "SK250-WALL-M",
+        "roof": "SK250-ROOF-FLAT-1DEG",
+        "approx_blocks": 48
+      },
+      "two_bed_house_70sqm": {
+        "series": "SK250",
+        "floor_block": "SK250-FLOOR-L",
+        "wall_block": "SK250-WALL-M",
+        "roof": "SK250-ROOF-FLAT-1DEG",
+        "approx_blocks": 80
+      }
+    },
+    "cost_estimate_per_sqm_gbp": {
+      "note": "Approximate superstructure only (blocks + assembly). Excludes foundations, windows, cladding, fit-out.",
+      "sk250_range": "400-450"
+    }
+  }
+}

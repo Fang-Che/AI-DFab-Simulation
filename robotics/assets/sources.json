@@ -1,0 +1,26 @@
+[
+  {
+    "file": "SKYLARK250_WALL-M_cnc.dxf",
+    "url": "https://raw.githubusercontent.com/wikihouseproject/Skylark/3684e1669ac2b70e8afe8c859a6178c9982e3502/SKYLARK250/Walls/SKYLARK250_WALL-M/SKYLARK250_WALL-M_cnc.dxf",
+    "repository_commit": "3684e1669ac2b70e8afe8c859a6178c9982e3502",
+    "sha256": "0fcba54c82978b1292d21e039bd6d4c31e8861b3807748758b4cf2cb1df53642",
+    "copyright": "WikiHouse / Open Systems Lab; original asset notices retained.",
+    "purpose": "Research reference. Imported geometry is not an engineering approval."
+  },
+  {
+    "file": "SKYLARK250_WALL-M_cnc.svg",
+    "url": "https://raw.githubusercontent.com/wikihouseproject/Skylark/3684e1669ac2b70e8afe8c859a6178c9982e3502/SKYLARK250/Walls/SKYLARK250_WALL-M/SKYLARK250_WALL-M_cnc.svg",
+    "repository_commit": "3684e1669ac2b70e8afe8c859a6178c9982e3502",
+    "sha256": "9bfd4642ed1d2a5ebe6dce9d629f743eb4023cacac84969f4675cfd0803472f7",
+    "copyright": "WikiHouse / Open Systems Lab; original asset notices retained.",
+    "purpose": "Research reference. Imported geometry is not an engineering approval."
+  },
+  {
+    "file": "SKYLARK250_WALL-M.3dm",
+    "url": "https://raw.githubusercontent.com/wikihouseproject/Skylark/3684e1669ac2b70e8afe8c859a6178c9982e3502/SKYLARK250/Walls/SKYLARK250_WALL-M/SKYLARK250_WALL-M_detailed/SKYLARK250_WALL-M.3dm",
+    "repository_commit": "3684e1669ac2b70e8afe8c859a6178c9982e3502",
+    "sha256": "eeb6faf597d71fb908cf08c2f41ee2a0af5a72288c4e7bf8a2b95a5abfd288cb",
+    "copyright": "WikiHouse / Open Systems Lab; original asset notices retained.",
+    "purpose": "Research reference. Imported geometry is not an engineering approval."
+  }
+]

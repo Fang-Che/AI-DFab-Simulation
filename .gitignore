@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+*-env/
+__pycache__/
+*.py[cod]
+*.log
+.langgraph_api/
+output_cache/
+robotics/runs/
+robotics/rhino_state.json
+local_assets/
+repair_backups/
+.streamlit/secrets.toml
+.DS_Store
